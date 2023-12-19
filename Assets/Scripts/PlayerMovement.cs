@@ -12,7 +12,6 @@ public class PlayerMovement : MonoBehaviour
 
     void Start()
     {
-        // Assuming the PathFinding script is attached to the same GameObject
         pathfinding = GetComponent<PathFinding>();
     }
 
@@ -47,7 +46,9 @@ public class PlayerMovement : MonoBehaviour
                 path = null;
                 currentWaypoint = 0;
             }
+
         }
+        
     }
 
     public void SetPath(List<PlayerNode> newPath)

@@ -1,24 +1,113 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
+
 
 public class PathFinding : MonoBehaviour
 {
-    public Transform seeker,target ;
+    public Transform seeker, target;
     PlayerGrid grid;
     //public PlayerMovement playerMovement;
-    void Awake(){
+    void Awake() {
         grid = GetComponent<PlayerGrid>();
 
     }
-    void Update(){
-        FindPath(seeker.position, target.position);
-        
-        
+    private void Start()
+    {
+        //FindPathAStar(seeker.position, target.position);
+        //FindPathDFS(seeker.position, target.position);
+        //FindPathBFS(seeker.position, target.position);
     }
-   
-    // Start is called before the first frame update
-    void FindPath(Vector3 startPos, Vector3 targetPos){
+    void Update() {
+        //FindPathAStar(seeker.position, target.position);
+        //FindPathDFS(seeker.position, target.position);
+        //FindPathBFS(seeker.position, target.position);
+
+
+    }
+    public void ApplyDFS()
+    {
+        FindPathDFS(seeker.position, target.position);
+    }public void ApplyBFS()
+    {
+        FindPathBFS(seeker.position, target.position);
+    }public void ApplyAStar()
+    {
+        FindPathAStar(seeker.position, target.position);
+    }
+
+
+    void FindPathDFS(Vector3 startPos, Vector3 targetPos)
+    {
+        PlayerNode startNode = grid.NodeFromWorldPoint(startPos);
+        PlayerNode targetNode = grid.NodeFromWorldPoint(targetPos);
+
+        Stack<PlayerNode> stack = new Stack<PlayerNode>();
+        HashSet<PlayerNode> visited = new HashSet<PlayerNode>();
+
+        stack.Push(startNode);
+
+        while (stack.Count > 0)
+        {
+            PlayerNode currentNode = stack.Pop();
+
+            if (currentNode == targetNode)
+            {
+                RetracePath(startNode, targetNode);
+                return;
+            }
+
+            if (!visited.Contains(currentNode))
+            {
+                visited.Add(currentNode);
+                foreach (PlayerNode neighbour in grid.GetNeighbours(currentNode))
+                {
+                    if (neighbour.walkable && !visited.Contains(neighbour))
+                    {
+                        stack.Push(neighbour);
+                        neighbour.parent = currentNode;
+                    }
+                }
+            }
+        }
+    }
+
+    void FindPathBFS(Vector3 startPos, Vector3 targetPos)
+    {
+        PlayerNode startNode = grid.NodeFromWorldPoint(startPos);
+        PlayerNode targetNode = grid.NodeFromWorldPoint(targetPos);
+
+        Queue<PlayerNode> queue = new Queue<PlayerNode>();
+        HashSet<PlayerNode> visited = new HashSet<PlayerNode>();
+
+        queue.Enqueue(startNode);
+
+        while (queue.Count > 0)
+        {
+            PlayerNode currentNode = queue.Dequeue();
+
+            if (currentNode == targetNode)
+            {
+                RetracePath(startNode, targetNode);
+                return;
+            }
+
+            if (!visited.Contains(currentNode))
+            {
+                visited.Add(currentNode);
+                foreach (PlayerNode neighbour in grid.GetNeighbours(currentNode))
+                {
+                    if (neighbour.walkable && !visited.Contains(neighbour))
+                    {
+                        queue.Enqueue(neighbour);
+                        neighbour.parent = currentNode;
+                    }
+                }
+            }
+        }
+    }
+    void FindPathAStar(Vector3 startPos, Vector3 targetPos){
         PlayerNode startNode = grid.NodeFromWorldPoint(startPos);
         PlayerNode targetNode = grid.NodeFromWorldPoint(targetPos);
 
